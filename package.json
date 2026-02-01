@@ -15,6 +15,7 @@
     "setup": "bun run setup.ts",
     "seed": "bun run lib/db/seed.ts",
     "seed:leaderboard": "bun run lib/db/seed-leaderboard.ts",
+    "seed:nfl": "bun run lib/db/seed-nfl-players.ts",
     "db:clear": "bun run lib/db/clear-data.ts"
   },
   "devDependencies": {

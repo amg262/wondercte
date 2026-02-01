@@ -2,6 +2,7 @@
 
 import { db, testAttempts, users, groupMembers } from "@/lib/db";
 import { eq, desc, sql, and } from "drizzle-orm";
+import { getNflPlayerMatch } from "./nfl-comparison";
 
 export interface LeaderboardEntry {
   userId: string;
@@ -11,6 +12,8 @@ export interface LeaderboardEntry {
   totalAttempts: number;
   avgScore: number;
   rank: number;
+  nflPlayerName?: string;
+  nflPlayerPosition?: string;
 }
 
 export async function getGlobalLeaderboard(limit: number = 100): Promise<LeaderboardEntry[]> {
@@ -30,11 +33,20 @@ export async function getGlobalLeaderboard(limit: number = 100): Promise<Leaderb
       .orderBy(desc(sql`MAX(${testAttempts.score})`))
       .limit(limit);
 
-    // Add ranks
-    return leaderboard.map((entry, index) => ({
-      ...entry,
-      rank: index + 1,
-    }));
+    // Add ranks and NFL player matches
+    const entriesWithRanks = await Promise.all(
+      leaderboard.map(async (entry, index) => {
+        const nflMatch = await getNflPlayerMatch(entry.bestScore);
+        return {
+          ...entry,
+          rank: index + 1,
+          nflPlayerName: nflMatch?.name,
+          nflPlayerPosition: nflMatch?.position,
+        };
+      })
+    );
+
+    return entriesWithRanks;
   } catch (error) {
     console.error("Error fetching global leaderboard:", error);
     throw new Error("Failed to fetch leaderboard");
@@ -70,10 +82,20 @@ export async function getGroupLeaderboard(groupId: string): Promise<LeaderboardE
       .groupBy(users.id, users.name, users.avatarUrl)
       .orderBy(desc(sql`MAX(${testAttempts.score})`));
 
-    return leaderboard.map((entry, index) => ({
-      ...entry,
-      rank: index + 1,
-    }));
+    // Add ranks and NFL player matches
+    const entriesWithRanks = await Promise.all(
+      leaderboard.map(async (entry, index) => {
+        const nflMatch = await getNflPlayerMatch(entry.bestScore);
+        return {
+          ...entry,
+          rank: index + 1,
+          nflPlayerName: nflMatch?.name,
+          nflPlayerPosition: nflMatch?.position,
+        };
+      })
+    );
+
+    return entriesWithRanks;
   } catch (error) {
     console.error("Error fetching group leaderboard:", error);
     throw new Error("Failed to fetch group leaderboard");

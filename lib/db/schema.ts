@@ -111,6 +111,20 @@ export const testQuestions = pgTable("test_questions", {
   difficultyIdx: index("test_questions_difficulty_idx").on(table.difficulty),
 }));
 
+// NFL Players table (for Wonderlic score comparison)
+export const nflPlayers = pgTable("nfl_players", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: varchar("name", { length: 255 }).notNull(),
+  position: varchar("position", { length: 50 }).notNull(),
+  team: varchar("team", { length: 255 }).notNull(),
+  wonderlicScore: integer("wonderlic_score").notNull(), // 0-50 (Wonderlic scale)
+  draftYear: integer("draft_year"),
+  imageUrl: varchar("image_url", { length: 500 }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => ({
+  scoreIdx: index("nfl_players_score_idx").on(table.wonderlicScore),
+}));
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   testAttempts: many(testAttempts),
@@ -155,3 +169,5 @@ export type GroupMember = typeof groupMembers.$inferSelect;
 export type NewGroupMember = typeof groupMembers.$inferInsert;
 export type TestQuestion = typeof testQuestions.$inferSelect;
 export type NewTestQuestion = typeof testQuestions.$inferInsert;
+export type NflPlayer = typeof nflPlayers.$inferSelect;
+export type NewNflPlayer = typeof nflPlayers.$inferInsert;

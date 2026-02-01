@@ -8,7 +8,7 @@ async function seedLeaderboardData() {
   try {
     // Your friends with specific rankings
     const testUsers = [
-      { name: "Mason Koehn", email: "mason@example.com", targetScore: 45 }, // 1st - Top score
+      { name: "Mason Koehn", email: "mason@example.com", targetScore: 48 }, // 1st - Matches Fitzpatrick
       { name: "Peyton Ropas", email: "peyton@example.com", targetScore: 42 }, // 2nd
       { name: "Ryan Richards", email: "ryan@example.com", targetScore: 38 }, // 3rd
       { name: "Mike Sanders", email: "mike@example.com", targetScore: 35 }, // 4th
@@ -35,11 +35,14 @@ async function seedLeaderboardData() {
       const user = createdUsers[i]!;
       const targetScore = testUsers[i]!.targetScore;
       const numAttempts = Math.floor(Math.random() * 2) + 2; // 2-3 attempts per user
-      
+
       for (let j = 0; j < numAttempts; j++) {
         // Generate score around target (best score should be the target)
         let score;
-        if (j === 0) {
+        if (i === 0) {
+          // Mason Koehn gets 48 on all attempts (matches Ryan Fitzpatrick)
+          score = 48;
+        } else if (j === 0) {
           // First attempt is the best score (target)
           score = targetScore;
         } else {

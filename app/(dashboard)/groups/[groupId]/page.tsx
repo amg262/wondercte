@@ -8,6 +8,7 @@ import { getGroupMembers } from "@/lib/actions/groups";
 import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users } from "lucide-react";
+import Link from "next/link";
 
 export default async function GroupDetailPage({
   params,
@@ -67,9 +68,10 @@ export default async function GroupDetailPage({
               <CardContent>
                 <div className="space-y-3">
                   {members.map((member) => (
-                    <div
+                    <Link
                       key={member.id}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50"
+                      href={`/users/${member.userId}`}
+                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
                     >
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
                         {member.avatarUrl ? (
@@ -83,12 +85,14 @@ export default async function GroupDetailPage({
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium truncate">{member.name}</p>
+                        <p className="font-medium truncate hover:text-primary transition-colors">
+                          {member.name}
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           {new Date(member.joinedAt).toLocaleDateString()}
                         </p>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </CardContent>

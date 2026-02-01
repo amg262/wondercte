@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Trophy, Users } from "lucide-react";
+import { User, LogOut, Trophy, Users, Brain } from "lucide-react";
 
 export function Navbar() {
   const session = authClient.useSession();
@@ -18,6 +18,12 @@ export function Navbar() {
 
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <nav className="flex items-center space-x-6">
+            <Link href="/algorithm">
+              <Button variant="ghost" size="sm">
+                <Brain className="h-4 w-4 mr-2" />
+                Algorithm
+              </Button>
+            </Link>
             {session.data?.user ? (
               <>
                 <Link href="/leaderboard">

@@ -3,10 +3,12 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { getUserTestHistory } from "@/lib/actions/test";
 import { getUserRank } from "@/lib/actions/leaderboard";
+import { getNflComparison } from "@/lib/actions/nfl-comparison";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Target, TrendingUp, Clock, Brain } from "lucide-react";
 import Link from "next/link";
+import { NflComparisonCard } from "@/components/nfl/nfl-comparison-card";
 
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
@@ -17,12 +19,14 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const [testHistory, userRank] = await Promise.all([
-    getUserTestHistory(session.user.id),
+  const testHistory = await getUserTestHistory(session.user.id);
+  const bestScore = testHistory.length > 0 ? Math.max(...testHistory.map((t) => t.score)) : 0;
+
+  const [userRank, nflComparison] = await Promise.all([
     getUserRank(session.user.id),
+    bestScore > 0 ? getNflComparison(bestScore) : null,
   ]);
 
-  const bestScore = testHistory.length > 0 ? Math.max(...testHistory.map((t) => t.score)) : 0;
   const avgScore =
     testHistory.length > 0
       ? Math.round(testHistory.reduce((sum, t) => sum + t.score, 0) / testHistory.length)
@@ -128,6 +132,11 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* NFL Player Comparison */}
+        {nflComparison && (
+          <NflComparisonCard userScore={bestScore} comparison={nflComparison} />
+        )}
 
         {/* Recent Tests */}
         {testHistory.length > 0 && (
