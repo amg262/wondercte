@@ -46,24 +46,24 @@ export default async function UserPage({ params }: UserPageProps) {
     <div className="container py-8">
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Profile Header */}
-        <div className="flex items-start gap-6">
-          <div className="h-24 w-24 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+        <div className="flex items-start gap-4 sm:gap-6">
+          <div className="h-16 w-16 sm:h-24 sm:w-24 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
             {userProfile.avatarUrl ? (
               <img
                 src={userProfile.avatarUrl}
                 alt={userProfile.name}
-                className="h-24 w-24 rounded-full"
+                className="h-16 w-16 sm:h-24 sm:w-24 rounded-full"
               />
             ) : (
-              <UserIcon className="h-12 w-12 text-primary" />
+              <UserIcon className="h-8 w-8 sm:h-12 sm:w-12 text-primary" />
             )}
           </div>
 
-          <div className="flex-1">
-            <div className="flex items-start justify-between">
-              <div>
-                <h1 className="text-3xl font-bold mb-2">{userProfile.name}</h1>
-                <div className="flex items-center gap-4 text-muted-foreground">
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="text-2xl sm:text-3xl font-bold mb-2 break-words">{userProfile.name}</h1>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     <span className="text-sm">
@@ -94,7 +94,7 @@ export default async function UserPage({ params }: UserPageProps) {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
@@ -172,7 +172,7 @@ export default async function UserPage({ params }: UserPageProps) {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-4 rounded-lg border bg-green-500/10 border-green-500/20">
                   <div className="text-sm text-muted-foreground mb-1">Excellent (40-50)</div>
                   <div className="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -296,15 +296,15 @@ export default async function UserPage({ params }: UserPageProps) {
 
         {/* Quick Actions */}
         {!isOwnProfile && (
-          <div className="flex justify-center gap-4">
-            <Link href="/leaderboard">
-              <Button variant="outline" size="lg">
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/leaderboard" className="w-full sm:w-auto">
+              <Button variant="outline" size="lg" className="w-full">
                 <Trophy className="mr-2 h-5 w-5" />
                 View Leaderboard
               </Button>
             </Link>
-            <Link href="/test">
-              <Button size="lg">
+            <Link href="/test" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full">
                 <Brain className="mr-2 h-5 w-5" />
                 Challenge {userProfile.name.split(' ')[0]}
               </Button>

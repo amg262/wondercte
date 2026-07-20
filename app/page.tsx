@@ -21,15 +21,15 @@ export default function Home() {
               </p>
             </div>
             
-            <div className="flex gap-4">
-              <Link href="/test">
-                <Button size="lg" className="text-lg px-8">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Link href="/test" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full text-lg px-8">
                   <Brain className="mr-2 h-5 w-5" />
                   Take Test
                 </Button>
               </Link>
-              <Link href="/leaderboard">
-                <Button size="lg" variant="outline" className="text-lg px-8">
+              <Link href="/leaderboard" className="w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="w-full text-lg px-8">
                   <Trophy className="mr-2 h-5 w-5" />
                   View Leaderboard
                 </Button>

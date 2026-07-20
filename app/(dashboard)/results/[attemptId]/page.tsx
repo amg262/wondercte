@@ -69,15 +69,15 @@ export default async function ResultsPage({
 
         <NflComparisonCard userScore={attempt.score} comparison={comparison} />
 
-        <div className="flex gap-4 justify-center">
-          <Link href="/test">
-            <Button size="lg">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/test" className="w-full sm:w-auto">
+            <Button size="lg" className="w-full">
               <Brain className="mr-2 h-5 w-5" />
               Take Again
             </Button>
           </Link>
-          <Link href="/leaderboard">
-            <Button size="lg" variant="outline">
+          <Link href="/leaderboard" className="w-full sm:w-auto">
+            <Button size="lg" variant="outline" className="w-full">
               <Trophy className="mr-2 h-5 w-5" />
               View Leaderboard
             </Button>
