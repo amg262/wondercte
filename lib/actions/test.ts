@@ -24,6 +24,7 @@ export async function submitTestAttempt(data: {
   userId: string;
   answers: Record<string, string>;
   timeTakenSeconds: number;
+  mode: "short" | "full";
 }) {
   try {
     // Fetch all questions with correct answers
@@ -60,6 +61,7 @@ export async function submitTestAttempt(data: {
         score,
         timeTakenSeconds: data.timeTakenSeconds,
         questionsAnswered,
+        mode: data.mode,
       })
       .returning();
 
@@ -90,6 +92,9 @@ export async function getTestAttempt(attemptId: string) {
         score: testAttempts.score,
         timeTakenSeconds: testAttempts.timeTakenSeconds,
         completedAt: testAttempts.completedAt,
+        mode: testAttempts.mode,
+        eliteQuotient: testAttempts.eliteQuotient,
+        maxDifficultyReached: testAttempts.maxDifficultyReached,
       })
       .from(testAttempts)
       .innerJoin(users, eq(testAttempts.userId, users.id))

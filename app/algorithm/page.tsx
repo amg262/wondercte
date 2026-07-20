@@ -1,6 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Brain, Clock, Target, Activity, TrendingUp, Zap, Calculator } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "ACE Algorithm | WonderCTE",
@@ -21,51 +23,66 @@ export default function AlgorithmPage() {
 
         {/* Test Types Overview */}
         <div className="grid md:grid-cols-3 gap-6">
-          <Card>
+          <Card className="flex flex-col">
             <CardHeader>
               <Clock className="h-10 w-10 mb-3 text-primary" />
               <CardTitle>Short Test</CardTitle>
               <CardDescription>25 Questions</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <p className="text-sm">Quick assessment with standard Wonderlic scoring</p>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p><strong>Duration:</strong> ~12 minutes</p>
-                <p><strong>Best for:</strong> Quick benchmarking</p>
-                <p><strong>Scoring:</strong> 0-50 scale</p>
+            <CardContent className="space-y-4 flex-1 flex flex-col">
+              <div className="space-y-2 flex-1">
+                <p className="text-sm">Quick assessment with standard Wonderlic scoring</p>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p><strong>Duration:</strong> ~12 minutes</p>
+                  <p><strong>Best for:</strong> Quick benchmarking</p>
+                  <p><strong>Scoring:</strong> 0-50 scale</p>
+                </div>
               </div>
+              <Link href="/test?mode=short">
+                <Button variant="outline" className="w-full">Take This Test</Button>
+              </Link>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="flex flex-col">
             <CardHeader>
               <Brain className="h-10 w-10 mb-3 text-primary" />
               <CardTitle>Full Test</CardTitle>
               <CardDescription>50 Questions</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <p className="text-sm">Complete assessment with comprehensive scoring</p>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p><strong>Duration:</strong> ~25 minutes</p>
-                <p><strong>Best for:</strong> Detailed evaluation</p>
-                <p><strong>Scoring:</strong> 0-50 scale</p>
+            <CardContent className="space-y-4 flex-1 flex flex-col">
+              <div className="space-y-2 flex-1">
+                <p className="text-sm">Complete assessment with comprehensive scoring</p>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p><strong>Duration:</strong> ~25 minutes</p>
+                  <p><strong>Best for:</strong> Detailed evaluation</p>
+                  <p><strong>Scoring:</strong> 0-50 scale</p>
+                </div>
               </div>
+              <Link href="/test?mode=full">
+                <Button variant="outline" className="w-full">Take This Test</Button>
+              </Link>
             </CardContent>
           </Card>
 
-          <Card className="border-primary">
+          <Card className="border-primary flex flex-col">
             <CardHeader>
               <Activity className="h-10 w-10 mb-3 text-primary" />
               <CardTitle>Adaptive (ACE)</CardTitle>
-              <CardDescription>Variable Questions</CardDescription>
+              <CardDescription>10-20 Questions</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <p className="text-sm">Dynamic difficulty with efficiency-based scoring</p>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p><strong>Duration:</strong> Variable</p>
-                <p><strong>Best for:</strong> Elite performance</p>
-                <p><strong>Scoring:</strong> Elite Quotient</p>
+            <CardContent className="space-y-4 flex-1 flex flex-col">
+              <div className="space-y-2 flex-1">
+                <p className="text-sm">Dynamic difficulty with efficiency-based scoring</p>
+                <div className="text-sm text-muted-foreground space-y-1">
+                  <p><strong>Duration:</strong> Variable</p>
+                  <p><strong>Best for:</strong> Elite performance</p>
+                  <p><strong>Scoring:</strong> Elite Quotient</p>
+                </div>
               </div>
+              <Link href="/test?mode=adaptive">
+                <Button className="w-full">Take This Test</Button>
+              </Link>
             </CardContent>
           </Card>
         </div>
@@ -136,7 +153,7 @@ export default function AlgorithmPage() {
                     <td className="py-3 px-3 font-mono">D<sub>i</sub></td>
                     <td className="py-3 px-3">Difficulty</td>
                     <td className="py-3 px-3">Integer</td>
-                    <td className="py-3 px-3">The complexity rating of the specific question (1-10)</td>
+                    <td className="py-3 px-3">The complexity rating of the specific question (1-5)</td>
                   </tr>
                   <tr>
                     <td className="py-3 px-3 font-mono">T<sub>i</sub></td>

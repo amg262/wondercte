@@ -1,4 +1,4 @@
-import { pgTable, uuid, varchar, timestamp, integer, boolean, jsonb, unique, index, text } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, timestamp, integer, boolean, jsonb, unique, index, text, real } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
 // Better Auth tables
@@ -67,6 +67,9 @@ export const testAttempts = pgTable("test_attempts", {
   timeTakenSeconds: integer("time_taken_seconds").notNull(),
   completedAt: timestamp("completed_at").defaultNow().notNull(),
   questionsAnswered: jsonb("questions_answered").notNull(),
+  mode: varchar("mode", { length: 20 }).notNull().default("short"), // short | full | adaptive
+  eliteQuotient: real("elite_quotient"), // ACE score, adaptive mode only
+  maxDifficultyReached: integer("max_difficulty_reached"), // adaptive mode only
 }, (table) => ({
   userIdIdx: index("test_attempts_user_id_idx").on(table.userId),
   scoreIdx: index("test_attempts_score_idx").on(table.score),
@@ -105,6 +108,7 @@ export const testQuestions = pgTable("test_questions", {
   difficulty: integer("difficulty").notNull(), // 1-5
   correctAnswer: varchar("correct_answer", { length: 500 }).notNull(),
   options: jsonb("options").notNull(), // Array of options for multiple choice
+  targetTimeMs: integer("target_time_ms").notNull().default(15000), // ACE elite benchmark (T_target)
   createdAt: timestamp("created_at").defaultNow().notNull(),
 }, (table) => ({
   typeIdx: index("test_questions_type_idx").on(table.questionType),
