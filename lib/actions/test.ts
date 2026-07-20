@@ -1,7 +1,7 @@
 "use server";
 
 import { db, testQuestions, testAttempts, type NewTestAttempt } from "@/lib/db";
-import { eq, sql } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function getRandomQuestions(count: number = 15) {
@@ -31,9 +31,7 @@ export async function submitTestAttempt(data: {
     const questions = await db
       .select()
       .from(testQuestions)
-      .where(
-        sql`${testQuestions.id} = ANY(${questionIds}::uuid[])`
-      );
+      .where(inArray(testQuestions.id, questionIds));
 
     // Calculate score (Wonderlic scale: out of 50)
     let correctCount = 0;

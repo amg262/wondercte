@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { getRandomQuestions, submitTestAttempt } from "@/lib/actions/test";
+import { getOrCreateAppUserId } from "@/lib/actions/user-sync";
 import { TestInterface } from "@/components/test/test-interface";
 
 export default async function TestPage() {
@@ -13,12 +14,13 @@ export default async function TestPage() {
     redirect("/login");
   }
 
+  const appUserId = await getOrCreateAppUserId(session.user);
   const rawQuestions = await getRandomQuestions(15);
-  
-  // Parse options from JSONB to string array
+
+  // drizzle's jsonb columns deserialize to native values already
   const questions = rawQuestions.map((q) => ({
     ...q,
-    options: JSON.parse(q.options as string) as string[],
+    options: q.options as string[],
   }));
 
   const handleSubmit = async (data: {
@@ -27,7 +29,7 @@ export default async function TestPage() {
   }) => {
     "use server";
     return await submitTestAttempt({
-      userId: session.user.id,
+      userId: appUserId,
       ...data,
     });
   };
@@ -36,7 +38,7 @@ export default async function TestPage() {
     <div className="container py-8">
       <TestInterface
         questions={questions}
-        userId={session.user.id}
+        userId={appUserId}
         onSubmit={handleSubmit}
       />
     </div>

@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { getUserTestHistory } from "@/lib/actions/test";
 import { getUserRank } from "@/lib/actions/leaderboard";
 import { getNflComparison } from "@/lib/actions/nfl-comparison";
+import { getOrCreateAppUserId } from "@/lib/actions/user-sync";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Target, TrendingUp, Clock, Brain } from "lucide-react";
@@ -19,11 +20,12 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const testHistory = await getUserTestHistory(session.user.id);
+  const appUserId = await getOrCreateAppUserId(session.user);
+  const testHistory = await getUserTestHistory(appUserId);
   const bestScore = testHistory.length > 0 ? Math.max(...testHistory.map((t) => t.score)) : 0;
 
   const [userRank, nflComparison] = await Promise.all([
-    getUserRank(session.user.id),
+    getUserRank(appUserId),
     bestScore > 0 ? getNflComparison(bestScore) : null,
   ]);
 

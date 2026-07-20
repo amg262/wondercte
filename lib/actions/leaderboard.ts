@@ -1,7 +1,7 @@
 "use server";
 
 import { db, testAttempts, users, groupMembers } from "@/lib/db";
-import { eq, desc, sql, and } from "drizzle-orm";
+import { eq, desc, sql, inArray } from "drizzle-orm";
 import { getNflPlayerMatch } from "./nfl-comparison";
 
 export interface LeaderboardEntry {
@@ -78,7 +78,7 @@ export async function getGroupLeaderboard(groupId: string): Promise<LeaderboardE
       })
       .from(testAttempts)
       .innerJoin(users, eq(testAttempts.userId, users.id))
-      .where(sql`${testAttempts.userId} = ANY(${userIds}::uuid[])`)
+      .where(inArray(testAttempts.userId, userIds))
       .groupBy(users.id, users.name, users.avatarUrl)
       .orderBy(desc(sql`MAX(${testAttempts.score})`));
 

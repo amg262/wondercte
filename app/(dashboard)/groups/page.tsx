@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { getUserGroups } from "@/lib/actions/groups";
+import { getOrCreateAppUserId } from "@/lib/actions/user-sync";
 import { CreateGroupForm, JoinGroupForm } from "@/components/groups/group-forms";
 import { GroupCard } from "@/components/groups/group-card";
 
@@ -14,7 +15,8 @@ export default async function GroupsPage() {
     redirect("/login");
   }
 
-  const groups = await getUserGroups(session.user.id);
+  const appUserId = await getOrCreateAppUserId(session.user);
+  const groups = await getUserGroups(appUserId);
 
   return (
     <div className="container py-8">
@@ -27,8 +29,8 @@ export default async function GroupsPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <CreateGroupForm userId={session.user.id} />
-          <JoinGroupForm userId={session.user.id} />
+          <CreateGroupForm userId={appUserId} />
+          <JoinGroupForm userId={appUserId} />
         </div>
 
         {groups.length > 0 ? (
@@ -39,7 +41,7 @@ export default async function GroupsPage() {
                 <GroupCard
                   key={group.id}
                   group={group}
-                  currentUserId={session.user.id}
+                  currentUserId={appUserId}
                 />
               ))}
             </div>

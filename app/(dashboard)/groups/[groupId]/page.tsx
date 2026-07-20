@@ -5,6 +5,7 @@ import { db, groups } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { getGroupLeaderboard } from "@/lib/actions/leaderboard";
 import { getGroupMembers } from "@/lib/actions/groups";
+import { getOrCreateAppUserId } from "@/lib/actions/user-sync";
 import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users } from "lucide-react";
@@ -23,6 +24,8 @@ export default async function GroupDetailPage({
   if (!session) {
     redirect("/login");
   }
+
+  const appUserId = await getOrCreateAppUserId(session.user);
 
   // Fetch group details
   const group = await db
@@ -52,7 +55,7 @@ export default async function GroupDetailPage({
           <div className="lg:col-span-2">
             <LeaderboardTable
               entries={leaderboard}
-              currentUserId={session.user.id}
+              currentUserId={appUserId}
             />
           </div>
 
@@ -70,7 +73,7 @@ export default async function GroupDetailPage({
                   {members.map((member) => (
                     <Link
                       key={member.id}
-                      href={`/users/${member.userId}`}
+                      href={`/users/${member.id}`}
                       className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
                     >
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
