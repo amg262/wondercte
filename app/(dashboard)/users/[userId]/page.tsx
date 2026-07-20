@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getVisitor } from "@/lib/actions/visitor";
 import { getUserProfile } from "@/lib/actions/user-profile";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,9 +14,7 @@ interface UserPageProps {
 
 export default async function UserPage({ params }: UserPageProps) {
   const { userId } = await params;
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const visitor = await getVisitor();
 
   const userProfile = await getUserProfile(userId);
 
@@ -25,7 +22,7 @@ export default async function UserPage({ params }: UserPageProps) {
     notFound();
   }
 
-  const isOwnProfile = session?.user?.id === userId;
+  const isOwnProfile = visitor?.id === userId;
 
   // Calculate percentile (simplified)
   const getPercentile = (rank: number) => {
@@ -306,14 +303,12 @@ export default async function UserPage({ params }: UserPageProps) {
                 View Leaderboard
               </Button>
             </Link>
-            {session && (
-              <Link href="/test">
-                <Button size="lg">
-                  <Brain className="mr-2 h-5 w-5" />
-                  Challenge {userProfile.name.split(' ')[0]}
-                </Button>
-              </Link>
-            )}
+            <Link href="/test">
+              <Button size="lg">
+                <Brain className="mr-2 h-5 w-5" />
+                Challenge {userProfile.name.split(' ')[0]}
+              </Button>
+            </Link>
           </div>
         )}
       </div>

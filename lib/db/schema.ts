@@ -51,7 +51,7 @@ export const verification = pgTable("verification", {
 // Original Users table (kept for backwards compatibility with test data)
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).unique(),
   name: varchar("name", { length: 255 }).notNull(),
   avatarUrl: varchar("avatar_url", { length: 500 }),
   googleId: varchar("google_id", { length: 255 }),

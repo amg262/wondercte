@@ -1,11 +1,9 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { notFound } from "next/navigation";
 import { db, groups } from "@/lib/db";
 import { eq } from "drizzle-orm";
 import { getGroupLeaderboard } from "@/lib/actions/leaderboard";
 import { getGroupMembers } from "@/lib/actions/groups";
-import { getOrCreateAppUserId } from "@/lib/actions/user-sync";
+import { getVisitor } from "@/lib/actions/visitor";
 import { LeaderboardTable } from "@/components/leaderboard/leaderboard-table";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users } from "lucide-react";
@@ -17,15 +15,7 @@ export default async function GroupDetailPage({
   params: Promise<{ groupId: string }>;
 }) {
   const { groupId } = await params;
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session) {
-    redirect("/login");
-  }
-
-  const appUserId = await getOrCreateAppUserId(session.user);
+  const visitor = await getVisitor();
 
   // Fetch group details
   const group = await db
@@ -35,7 +25,7 @@ export default async function GroupDetailPage({
     .limit(1);
 
   if (!group[0]) {
-    redirect("/groups");
+    notFound();
   }
 
   const [leaderboard, members] = await Promise.all([
@@ -55,7 +45,7 @@ export default async function GroupDetailPage({
           <div className="lg:col-span-2">
             <LeaderboardTable
               entries={leaderboard}
-              currentUserId={appUserId}
+              currentUserId={visitor?.id}
             />
           </div>
 

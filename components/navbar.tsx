@@ -1,13 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/button";
-import { User, LogOut, Trophy, Users, Brain } from "lucide-react";
+import { Trophy, Users, Brain, LayoutDashboard } from "lucide-react";
 
 export function Navbar() {
-  const session = authClient.useSession();
-
   return (
     <nav className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center px-4">
@@ -24,41 +21,29 @@ export function Navbar() {
                 Algorithm
               </Button>
             </Link>
-            {session.data?.user ? (
-              <>
-                <Link href="/leaderboard">
-                  <Button variant="ghost" size="sm">
-                    <Trophy className="h-4 w-4 mr-2" />
-                    Leaderboard
-                  </Button>
-                </Link>
-                <Link href="/groups">
-                  <Button variant="ghost" size="sm">
-                    <Users className="h-4 w-4 mr-2" />
-                    Groups
-                  </Button>
-                </Link>
-                <Link href="/dashboard">
-                  <Button variant="ghost" size="sm">
-                    <User className="h-4 w-4 mr-2" />
-                    {session.data.user.name}
-                  </Button>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => authClient.signOut()}
-                >
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </>
-            ) : (
-              <Link href="/login">
-                <Button variant="default" size="sm">
-                  Sign In
-                </Button>
-              </Link>
-            )}
+            <Link href="/leaderboard">
+              <Button variant="ghost" size="sm">
+                <Trophy className="h-4 w-4 mr-2" />
+                Leaderboard
+              </Button>
+            </Link>
+            <Link href="/groups">
+              <Button variant="ghost" size="sm">
+                <Users className="h-4 w-4 mr-2" />
+                Groups
+              </Button>
+            </Link>
+            <Link href="/dashboard">
+              <Button variant="ghost" size="sm">
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+            </Link>
+            <Link href="/test">
+              <Button variant="default" size="sm">
+                Take Test
+              </Button>
+            </Link>
           </nav>
         </div>
       </div>

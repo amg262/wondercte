@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, ChevronRight } from "lucide-react";
 import { formatTime } from "@/lib/utils";
@@ -15,14 +16,31 @@ interface Question {
   options: string[];
 }
 
-interface TestInterfaceProps {
-  questions: Question[];
-  userId: string;
-  onSubmit: (data: { answers: Record<string, string>; timeTakenSeconds: number }) => Promise<any>;
+interface SubmitResult {
+  success: boolean;
+  attemptId: string;
+  score: number;
+  correctCount: number;
+  totalQuestions: number;
 }
 
-export function TestInterface({ questions, userId, onSubmit }: TestInterfaceProps) {
+interface TestInterfaceProps {
+  questions: Question[];
+  initialName?: string;
+  onStart: (name: string) => Promise<string>;
+  onSubmit: (data: {
+    userId: string;
+    answers: Record<string, string>;
+    timeTakenSeconds: number;
+  }) => Promise<SubmitResult>;
+}
+
+export function TestInterface({ questions, initialName, onStart, onSubmit }: TestInterfaceProps) {
   const router = useRouter();
+  const [name, setName] = useState(initialName ?? "");
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isStarting, setIsStarting] = useState(false);
+  const [startError, setStartError] = useState("");
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [timeElapsed, setTimeElapsed] = useState(0);
@@ -61,14 +79,35 @@ export function TestInterface({ questions, userId, onSubmit }: TestInterfaceProp
     }
   };
 
+  const handleStart = async () => {
+    if (!name.trim()) {
+      setStartError("Even anonymous geniuses need a name.");
+      return;
+    }
+    setIsStarting(true);
+    setStartError("");
+    try {
+      const id = await onStart(name.trim());
+      setUserId(id);
+      setTestStarted(true);
+    } catch (error) {
+      console.error("Error starting test:", error);
+      setStartError("Couldn't get you set up. Try again?");
+    } finally {
+      setIsStarting(false);
+    }
+  };
+
   const handleSubmit = async () => {
+    if (!userId) return;
     setIsSubmitting(true);
     try {
-      await onSubmit({
+      const result = await onSubmit({
+        userId,
         answers,
         timeTakenSeconds: timeElapsed,
       });
-      router.push("/results");
+      router.push(`/results/${result.attemptId}`);
     } catch (error) {
       console.error("Error submitting test:", error);
       alert("Failed to submit test. Please try again.");
@@ -100,8 +139,27 @@ export function TestInterface({ questions, userId, onSubmit }: TestInterfaceProp
               <li>You can navigate back to previous questions</li>
             </ul>
           </div>
-          <Button onClick={() => setTestStarted(true)} size="lg" className="w-full">
-            Start Test
+
+          <div className="space-y-2">
+            <label htmlFor="visitor-name" className="text-sm font-medium">
+              What should we put on the leaderboard?
+            </label>
+            <Input
+              id="visitor-name"
+              placeholder="e.g. Definitely Not Concussed"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleStart()}
+              maxLength={100}
+            />
+            {startError && <p className="text-sm text-destructive">{startError}</p>}
+            <p className="text-xs text-muted-foreground">
+              No account needed — we'll remember you on this device.
+            </p>
+          </div>
+
+          <Button onClick={handleStart} size="lg" className="w-full" disabled={isStarting}>
+            {isStarting ? "Getting ready..." : "Start Test"}
           </Button>
         </CardContent>
       </Card>

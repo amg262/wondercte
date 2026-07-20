@@ -1,10 +1,7 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
 import { getUserTestHistory } from "@/lib/actions/test";
 import { getUserRank } from "@/lib/actions/leaderboard";
 import { getNflComparison } from "@/lib/actions/nfl-comparison";
-import { getOrCreateAppUserId } from "@/lib/actions/user-sync";
+import { getVisitor } from "@/lib/actions/visitor";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, Target, TrendingUp, Clock, Brain } from "lucide-react";
@@ -12,20 +9,33 @@ import Link from "next/link";
 import { NflComparisonCard } from "@/components/nfl/nfl-comparison-card";
 
 export default async function DashboardPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const visitor = await getVisitor();
 
-  if (!session) {
-    redirect("/login");
+  if (!visitor) {
+    return (
+      <div className="container py-8">
+        <div className="max-w-2xl mx-auto text-center py-16 space-y-4">
+          <Brain className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
+          <h1 className="text-2xl font-bold">Nothing here yet</h1>
+          <p className="text-muted-foreground">
+            Take the test once and we&apos;ll start tracking your questionable cognitive journey here.
+          </p>
+          <Link href="/test">
+            <Button size="lg">
+              <Brain className="mr-2 h-5 w-5" />
+              Take Your First Test
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
   }
 
-  const appUserId = await getOrCreateAppUserId(session.user);
-  const testHistory = await getUserTestHistory(appUserId);
+  const testHistory = await getUserTestHistory(visitor.id);
   const bestScore = testHistory.length > 0 ? Math.max(...testHistory.map((t) => t.score)) : 0;
 
   const [userRank, nflComparison] = await Promise.all([
-    getUserRank(appUserId),
+    getUserRank(visitor.id),
     bestScore > 0 ? getNflComparison(bestScore) : null,
   ]);
 
@@ -39,7 +49,7 @@ export default async function DashboardPage() {
     <div className="container py-8">
       <div className="max-w-6xl mx-auto space-y-8">
         <div>
-          <h1 className="text-3xl font-bold mb-2">Welcome back, {session.user.name}!</h1>
+          <h1 className="text-3xl font-bold mb-2">Welcome back, {visitor.name}!</h1>
           <p className="text-muted-foreground">Track your progress and challenge yourself</p>
         </div>
 

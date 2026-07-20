@@ -1,22 +1,32 @@
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { auth } from "@/lib/auth";
 import { getUserGroups } from "@/lib/actions/groups";
-import { getOrCreateAppUserId } from "@/lib/actions/user-sync";
+import { getVisitor, setVisitorName } from "@/lib/actions/visitor";
 import { CreateGroupForm, JoinGroupForm } from "@/components/groups/group-forms";
 import { GroupCard } from "@/components/groups/group-card";
+import { NameGate } from "@/components/identity/name-gate";
 
 export default async function GroupsPage() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  const visitor = await getVisitor();
 
-  if (!session) {
-    redirect("/login");
+  if (!visitor) {
+    const handleSetName = async (name: string) => {
+      "use server";
+      return await setVisitorName(name);
+    };
+
+    return (
+      <div className="container py-8">
+        <div className="max-w-md mx-auto">
+          <NameGate
+            title="Pick a name first"
+            description="Groups need something to put on the leaderboard. No account required."
+            onSetName={handleSetName}
+          />
+        </div>
+      </div>
+    );
   }
 
-  const appUserId = await getOrCreateAppUserId(session.user);
-  const groups = await getUserGroups(appUserId);
+  const groups = await getUserGroups(visitor.id);
 
   return (
     <div className="container py-8">
@@ -29,8 +39,8 @@ export default async function GroupsPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <CreateGroupForm userId={appUserId} />
-          <JoinGroupForm userId={appUserId} />
+          <CreateGroupForm userId={visitor.id} />
+          <JoinGroupForm userId={visitor.id} />
         </div>
 
         {groups.length > 0 ? (
@@ -41,14 +51,14 @@ export default async function GroupsPage() {
                 <GroupCard
                   key={group.id}
                   group={group}
-                  currentUserId={appUserId}
+                  currentUserId={visitor.id}
                 />
               ))}
             </div>
           </div>
         ) : (
           <div className="text-center py-12 text-muted-foreground">
-            <p>You haven't joined any groups yet.</p>
+            <p>You haven&apos;t joined any groups yet.</p>
             <p>Create one or join using an invite code!</p>
           </div>
         )}

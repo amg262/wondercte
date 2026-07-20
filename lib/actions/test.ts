@@ -1,6 +1,6 @@
 "use server";
 
-import { db, testQuestions, testAttempts, type NewTestAttempt } from "@/lib/db";
+import { db, testQuestions, testAttempts, users, type NewTestAttempt } from "@/lib/db";
 import { eq, inArray, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -77,6 +77,29 @@ export async function submitTestAttempt(data: {
   } catch (error) {
     console.error("Error submitting test attempt:", error);
     throw new Error("Failed to submit test attempt");
+  }
+}
+
+export async function getTestAttempt(attemptId: string) {
+  try {
+    const [attempt] = await db
+      .select({
+        id: testAttempts.id,
+        userId: testAttempts.userId,
+        userName: users.name,
+        score: testAttempts.score,
+        timeTakenSeconds: testAttempts.timeTakenSeconds,
+        completedAt: testAttempts.completedAt,
+      })
+      .from(testAttempts)
+      .innerJoin(users, eq(testAttempts.userId, users.id))
+      .where(eq(testAttempts.id, attemptId))
+      .limit(1);
+
+    return attempt ?? null;
+  } catch (error) {
+    console.error("Error fetching test attempt:", error);
+    return null;
   }
 }
 
