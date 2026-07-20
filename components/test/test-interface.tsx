@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,7 @@ export function TestInterface({ questions, initialName, onStart, onSubmit }: Tes
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testStarted, setTestStarted] = useState(false);
+  const advanceTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
@@ -60,20 +61,42 @@ export function TestInterface({ questions, initialName, onStart, onSubmit }: Tes
     return () => clearInterval(interval);
   }, [testStarted]);
 
+  useEffect(() => {
+    return () => {
+      if (advanceTimeoutRef.current) clearTimeout(advanceTimeoutRef.current);
+    };
+  }, []);
+
+  const clearPendingAdvance = () => {
+    if (advanceTimeoutRef.current) {
+      clearTimeout(advanceTimeoutRef.current);
+      advanceTimeoutRef.current = null;
+    }
+  };
+
   const handleAnswer = (answer: string) => {
     setAnswers((prev) => ({
       ...prev,
       [currentQuestion!.id]: answer,
     }));
+
+    clearPendingAdvance();
+    if (currentQuestionIndex < questions.length - 1) {
+      advanceTimeoutRef.current = setTimeout(() => {
+        setCurrentQuestionIndex((prev) => prev + 1);
+      }, 350);
+    }
   };
 
   const handleNext = () => {
+    clearPendingAdvance();
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     }
   };
 
   const handlePrevious = () => {
+    clearPendingAdvance();
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
     }
